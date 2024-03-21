@@ -1,0 +1,87 @@
+# .gitignore
+
+# Mac stuff
+.DS_Store
+
+# Node.js / React
+##################
+# Dependency directories
+node_modules/
+
+# Build output
+/build/
+/dist/
+
+# Environment Variables
+.env
+
+# Debug logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# IDE - VSCode
+.vscode/
+
+# ------------------------------
+
+# C# / .NET
+#############
+## Ignore Visual Studio temporary files, build results, and project files
+**/bin/
+**/obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore Visual Studio Code project settings
+.vscode/
+
+## Ignore .NET Core build output
+**/publish/
+
+## Ignore Visual Studio database project settings
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
+
+## Ignore specific project files (depending on your settings)
+App_Data/
+*.config
+*.csproj
+*.vbproj
+*.vcxproj
+*.fsproj
+*.lsproj
+*.wdproj
+*.wixproj
+*.syproj
+*.xproj
+*.sqlproj
+*.dbproj
+*.csproj.user
+*.vbproj.user
+*.vcxproj.user
+*.vcxproj.filters.user
+*.vcxproj.filters
+*.fsproj.user
+*.lsproj.user
+*.wdproj.user
+*.wixproj.user
+*.syproj.user
+*.xproj.user
+*.sqlproj.user
+*.dbproj.user
+*.csproj.vspscc
+*.vbproj.vspscc
+*.vcxproj.vspscc
+*.fsproj.vspscc
+*.lsproj.vspscc
+*.wdproj.vspscc
+*.wixproj.vspscc
+*.syproj.vspscc
+*.xproj.vspscc
+*.sqlproj.vspscc
+*.dbproj.vspscc
