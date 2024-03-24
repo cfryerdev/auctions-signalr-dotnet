@@ -49,18 +49,6 @@ yarn-error.log
 
 ## Ignore specific project files (depending on your settings)
 App_Data/
-*.config
-*.csproj
-*.vbproj
-*.vcxproj
-*.fsproj
-*.lsproj
-*.wdproj
-*.wixproj
-*.syproj
-*.xproj
-*.sqlproj
-*.dbproj
 *.csproj.user
 *.vbproj.user
 *.vcxproj.user
