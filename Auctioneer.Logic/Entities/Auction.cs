@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -20,9 +21,10 @@ namespace Auctioneer.Logic.Entities
 		Public = 2					// You can see what the current winning bid is, and who submitted it.
 	}
 
+	[Table("Auction")]
 	public class Auction
 	{
-		public string Id { get; set; }
+		public Guid Id { get; set; }
 
 		public string Name { get; set; }
 
@@ -76,9 +78,10 @@ namespace Auctioneer.Logic.Entities
 		public ICollection<AuctionItem> Items { get; set; }
 	}
 
+	[Table("AuctionItem")]
 	public class AuctionItem
 	{
-		public string Id { get; set; }
+		public Guid Id { get; set; }
 
 		public int? Index { get; set; }
 
@@ -86,7 +89,7 @@ namespace Auctioneer.Logic.Entities
 
 		public string Payload { get; set; }
 
-		public string AuctionId { get; set; }
+		public Guid AuctionId { get; set; }
 
 		[JsonIgnore]
 		public Auction Auction { get; set; }

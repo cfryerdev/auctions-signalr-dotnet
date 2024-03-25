@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,13 @@ namespace Auctioneer.Logic.Services
 {
 	public class RedisService
 	{
-		private readonly string Host = "192.168.68.112";
-		private readonly int Port = 6379;
 		private readonly int DatabaseId = 0;
 		private ConnectionMultiplexer _lazyConnection;
 
-		public RedisService()
+		public RedisService(IConfiguration config)
 		{
-			var connectionString = $"{Host}:{Port}";
-			_lazyConnection = ConnectionMultiplexer.Connect(connectionString);
+			var connectionString = config.GetConnectionString("RedisConnection");
+			_lazyConnection = ConnectionMultiplexer.Connect(connectionString != null ? connectionString : string.Empty);
 		}
 
 		public ConnectionMultiplexer Connection
@@ -29,11 +28,11 @@ namespace Auctioneer.Logic.Services
 			}
 		}
 
-		public IDatabase Database
+		public IDatabase DefaultDatabase
 		{
 			get
 			{
-				return _lazyConnection.GetDatabase(DatabaseId);
+				return Connection.GetDatabase(DatabaseId);
 			}
 		}
 	}

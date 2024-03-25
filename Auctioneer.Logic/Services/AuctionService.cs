@@ -1,16 +1,7 @@
 ﻿using Auctioneer.Logic.Database;
 using Auctioneer.Logic.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Auctioneer.Logic.Services
 {
@@ -22,7 +13,7 @@ namespace Auctioneer.Logic.Services
 		public AuctionService(AuctionContext dbContext, RedisService redisService) 
 		{
 			_dbContext = dbContext;
-			_redis = redisService.Database;
+			_redis = redisService.DefaultDatabase;
 		}
 
 		public void SubmitBid(string auctionId, string itemId, string userId, decimal bid)
@@ -31,17 +22,18 @@ namespace Auctioneer.Logic.Services
 			_redis.SortedSetAdd($"bids:{auctionId}:{itemId}", $"{userId}|{bid}", unixTimestamp);
 		}
 
-		public ActionLeader GetLeadingBid(string auctionId, string itemId)
+		public ActionLeader? GetLeadingBid(string auctionId, string itemId)
 		{
 			var winningBid = _redis.SortedSetRangeByRank($"bids:{auctionId}:{itemId}", start: 0, stop: 0, order: Order.Descending).FirstOrDefault();
-			var result = new ActionLeader();
 			if (winningBid.HasValue)
 			{
+				var result = new ActionLeader();
 				string[] userBid = winningBid.ToString().Split("|");
 				result.Name = userBid[0];
 				result.Amount = decimal.Parse(userBid[1]);
+				return result;
 			}
-			return result;
+			return null;
 		}
 
 		public List<Auction> ListPastAuctions()
@@ -81,7 +73,7 @@ namespace Auctioneer.Logic.Services
 				.ToList();
 		}
 
-		public Auction? ReadAuctionById(string id)
+		public Auction? ReadAuctionById(Guid id)
 		{
 			return _dbContext
 				.Auctions
@@ -89,7 +81,7 @@ namespace Auctioneer.Logic.Services
 				.SingleOrDefault(x => x.Id == id);
 		}
 
-		public ICollection<AuctionItem> ReadAuctionItemsById(string id)
+		public ICollection<AuctionItem> ReadAuctionItemsById(Guid id)
 		{
 			return _dbContext
 				.AuctionItems

@@ -14,7 +14,7 @@ namespace Auctioneer.Service.Routes
 		{
 			app
 				.MapGet("/api/lookups/auctions/{id}", (string id, AuctionService service) => {
-					return service.ReadAuctionById(id);
+					return service.ReadAuctionById(new Guid(id));
 				})
 				.WithTags(Tag)
 				.WithDescription("Gets details about this auction.")
@@ -24,7 +24,7 @@ namespace Auctioneer.Service.Routes
 
 			app
 				.MapGet("/api/lookups/auctions/{id}/items", (string id, AuctionService service) => {
-					return service.ReadAuctionItemsById(id);
+					return service.ReadAuctionItemsById(new Guid(id));
 				})
 				.WithTags(Tag)
 				.WithDescription("Gets details about this auction.")

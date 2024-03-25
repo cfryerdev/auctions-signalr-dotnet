@@ -19,7 +19,7 @@ namespace Auctioneer.Service.Routes
 				})
 				.WithTags(Tag)
 				.WithDescription("View the leading bid.")
-				.Produces<ActionLeader>(200)
+				.Produces<ActionLeader?>(200)
 				.Produces<HandledResponseModel>(500)
 				.WithOpenApi();
 
