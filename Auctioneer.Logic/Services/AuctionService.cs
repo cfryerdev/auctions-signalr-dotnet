@@ -16,10 +16,15 @@ namespace Auctioneer.Logic.Services
 			_redis = redisService.DefaultDatabase;
 		}
 
-		public void SubmitBid(string auctionId, string itemId, string userId, decimal bid)
+		public bool SubmitBid(string auctionId, string itemId, string userId, decimal bid)
 		{
 			int unixTimestamp = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-			_redis.SortedSetAdd($"bids:{auctionId}:{itemId}", $"{userId}|{bid}", unixTimestamp);
+			var winner = GetLeadingBid(auctionId, itemId);
+			var canSubmit = (winner == null || bid > winner.Amount);
+			if (canSubmit) {
+				_redis.SortedSetAdd($"bids:{auctionId}:{itemId}", $"{userId}|{bid}", unixTimestamp);
+			}
+			return canSubmit;
 		}
 
 		public ActionLeader? GetLeadingBid(string auctionId, string itemId)

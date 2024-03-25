@@ -20,8 +20,15 @@ namespace Auctioneer.Logic.Hubs
 
 		public async Task PlaceBid(string auctionId, string itemId, decimal bid)
 		{
-			_auctionService.SubmitBid(auctionId, itemId, Context.ConnectionId, bid);
-			await Clients.All.SendAsync("BidUpdated", auctionId);
+			var result = _auctionService.SubmitBid(auctionId, itemId, Context.ConnectionId, bid);
+			await Clients.Client(Context.ConnectionId).SendAsync("PlaceBidResult", result);
+			await NewLeadingBidBid(auctionId, itemId);
+		}
+
+		public async Task NewLeadingBidBid(string auctionId, string itemId)
+		{
+			var result = _auctionService.GetLeadingBid(auctionId, itemId);
+			await Clients.All.SendAsync("NewWinningBid", result);
 		}
 	}
 }
