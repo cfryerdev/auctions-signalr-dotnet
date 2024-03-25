@@ -1,65 +1,74 @@
 ﻿using Auctioneer.Logic.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Reflection.Emit;
 
-public class AuctionContext : DbContext
+namespace Auctioneer.Logic.Database
 {
-	public DbSet<Auction> Auctions { get; set; }
-	public DbSet<AuctionItem> AuctionItems { get; set; }
-
-	public AuctionContext(DbContextOptions<AuctionContext> options) : base(options)
+	public class AuctionContext : DbContext
 	{
-		//ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-		SeedData();
-	}
+		public DbSet<Auction> Auctions { get; set; }
+		public DbSet<AuctionItem> AuctionItems { get; set; }
 
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-	{
-		optionsBuilder.UseInMemoryDatabase("AuctionDb");
-		optionsBuilder.UseLazyLoadingProxies(false);
-	}
-
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
-		modelBuilder.Entity<Auction>()
-			.HasMany(a => a.Items)
-			.WithOne(i => i.Auction)
-			.HasForeignKey(i => i.AuctionId);
-	}
-
-	public void SeedData()
-	{
-		if (!Auctions.Any())
+		public AuctionContext(DbContextOptions<AuctionContext> options) : base(options)
 		{
-			Auctions.Add(new Auction { Id = 1, Name = "First Auction", TypeId = 2, StartDateTime = DateTime.Now.AddHours(-2), EndDateTime = DateTime.Now.AddHours(6) });
-			AuctionItems.Add(new AuctionItem { Id = 1, Name = "Item 1", Payload = "", AuctionId = 1 });
-			AuctionItems.Add(new AuctionItem { Id = 2, Name = "Item 2", Payload = "", AuctionId = 1 });
-			AuctionItems.Add(new AuctionItem { Id = 3, Name = "Item 3", Payload = "", AuctionId = 1 });
+			ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+			SeedData();
+		}
 
-			Auctions.Add(new Auction { Id = 2, Name = "Second Auction", TypeId = 1, StartDateTime = DateTime.Now.AddHours(-1), EndDateTime = DateTime.Now.AddHours(4).AddMinutes(12).AddSeconds(22) });
-			AuctionItems.Add(new AuctionItem { Id = 4, Name = "Item 1", Payload = "", AuctionId = 2 });
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		{
+			optionsBuilder.UseInMemoryDatabase("AuctionDb");
+			optionsBuilder.UseLazyLoadingProxies(false);
+		}
 
-			Auctions.Add(new Auction { Id = 3, Name = "Third Auction", TypeId = 2, StartDateTime = DateTime.Now.AddDays(-4), EndDateTime = DateTime.Now.AddDays(-3) });
-			AuctionItems.Add(new AuctionItem { Id = 5, Name = "Item 1", Payload = "", AuctionId = 3 });
-			AuctionItems.Add(new AuctionItem { Id = 6, Name = "Item 2", Payload = "", AuctionId = 3 });
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Auction>()
+				.HasMany(a => a.Items)
+				.WithOne(i => i.Auction)
+				.HasForeignKey(i => i.AuctionId);
+		}
 
-			Auctions.Add(new Auction { Id = 4, Name = "Fourth Auction", TypeId = 3, StartDateTime = DateTime.Now.AddDays(3), EndDateTime = DateTime.Now.AddDays(4) });
-			AuctionItems.Add(new AuctionItem { Id = 7, Name = "Item 1", Payload = "", AuctionId = 4 });
-			AuctionItems.Add(new AuctionItem { Id = 8, Name = "Item 2", Payload = "", AuctionId = 4 });
-			AuctionItems.Add(new AuctionItem { Id = 9, Name = "Item 3", Payload = "", AuctionId = 4 });
-			AuctionItems.Add(new AuctionItem { Id = 10, Name = "Item 4", Payload = "", AuctionId = 4 });
-			AuctionItems.Add(new AuctionItem { Id = 11, Name = "Item 5", Payload = "", AuctionId = 4 });
+		public void SeedData()
+		{
+			if (!Auctions.Any())
+			{
+				var auction1 = Guid.NewGuid().ToString();
+				Auctions.Add(new Auction { Id = auction1, Name = "First Auction", TypeId = 2, StartDateTime = DateTime.Now.AddHours(-2), EndDateTime = DateTime.Now.AddHours(6) });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 1", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction1, Index = 1 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 2", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction1, Index = 2 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 3", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction1, Index = 3 });
 
-			Auctions.Add(new Auction { Id = 5, Name = "Fifth Auction", TypeId = 3, StartDateTime = DateTime.Now.AddHours(3).AddSeconds(17), EndDateTime = DateTime.Now.AddHours(4).AddMinutes(12).AddSeconds(22) });
-			AuctionItems.Add(new AuctionItem { Id = 12, Name = "Item 1", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 13, Name = "Item 2", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 14, Name = "Item 3", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 15, Name = "Item 4", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 16, Name = "Item 5", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 17, Name = "Item 6", Payload = "", AuctionId = 5 });
-			AuctionItems.Add(new AuctionItem { Id = 18, Name = "Item 7", Payload = "", AuctionId = 5 });
+				var auction2 = Guid.NewGuid().ToString();
+				Auctions.Add(new Auction { Id = auction2, Name = "Second Auction", TypeId = 1, StartDateTime = DateTime.Now.AddHours(-1), EndDateTime = DateTime.Now.AddHours(4).AddMinutes(12).AddSeconds(22) });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 1", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction2 });
 
-			SaveChanges();
+				var auction3 = Guid.NewGuid().ToString();
+				Auctions.Add(new Auction { Id = auction3, Name = "Third Auction", TypeId = 2, StartDateTime = DateTime.Now.AddDays(-4), EndDateTime = DateTime.Now.AddDays(-3) });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 1", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction3, Index = 1 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 2", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction3, Index = 2 });
+
+				var auction4 = Guid.NewGuid().ToString();
+				Auctions.Add(new Auction { Id = auction4, Name = "Fourth Auction", TypeId = 3, StartDateTime = DateTime.Now.AddDays(3), EndDateTime = DateTime.Now.AddDays(4) });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 1", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction4 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 2", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction4 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 3", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction4 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 4", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction4 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 5", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction4 });
+
+				var auction5 = Guid.NewGuid().ToString();
+				Auctions.Add(new Auction { Id = auction5, Name = "Fifth Auction", TypeId = 3, StartDateTime = DateTime.Now.AddHours(3).AddSeconds(17), EndDateTime = DateTime.Now.AddHours(4).AddMinutes(12).AddSeconds(22) });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 1", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 2", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 3", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 4", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 5", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 6", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+				AuctionItems.Add(new AuctionItem { Id = Guid.NewGuid().ToString(), Name = "Item 7", Payload = PayloadGen.GenerateRandomVehicle(), AuctionId = auction5 });
+
+				SaveChanges();
+			}
 		}
 	}
 }

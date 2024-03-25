@@ -9,18 +9,26 @@ namespace Auctioneer.Logic.Entities
 {
 	public enum AuctionType
 	{
-		Single = 1,
-		MultipleSequential = 2,
-		MultipleOpenHouse = 3
+		Single = 1,					// Single item Auction
+		MultipleSequential = 2,		// Multiple item auction, each item is presented one at a time
+		MultipleOpenHouse = 3       // Multiple item auction, each item available all at once. (super auction)
+	}
+
+	public enum AuctionVisibility
+	{
+		Blind = 1,					// You can see what the current winning bid is, but not who is winning.
+		Public = 2					// You can see what the current winning bid is, and who submitted it.
 	}
 
 	public class Auction
 	{
-		public int Id { get; set; }
+		public string Id { get; set; }
 
 		public string Name { get; set; }
 
 		public int TypeId { get; set; }
+
+		public int VisibilityId { get; set; }
 
 		public DateTime StartDateTime { get; set; }
 
@@ -70,13 +78,15 @@ namespace Auctioneer.Logic.Entities
 
 	public class AuctionItem
 	{
-		public int Id { get; set; }
+		public string Id { get; set; }
+
+		public int? Index { get; set; }
 
 		public string Name { get; set; }
 
 		public string Payload { get; set; }
 
-		public int AuctionId { get; set; }
+		public string AuctionId { get; set; }
 
 		[JsonIgnore]
 		public Auction Auction { get; set; }

@@ -1,3 +1,4 @@
+using Auctioneer.Logic.Database;
 using Auctioneer.Logic.Hubs;
 using Auctioneer.Logic.Proxies;
 using Auctioneer.Logic.Services;
@@ -15,17 +16,12 @@ builder.Services.AddCors(options => options.AddPolicy("allowAny", o => o.AllowAn
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<AuctionContext>(o => o.UseInMemoryDatabase("AuctionDb"), ServiceLifetime.Singleton);
 builder.Services.AddSingleton<AuctionService>();
+builder.Services.AddSingleton<RedisService>();
 builder.Services.AddHostedService<ObservationProxy>();
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-	app.UseDeveloperExceptionPage();
-}
-else
-{
-	app.UseHttpsRedirection();
-}
+if (app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+else { app.UseHttpsRedirection(); }
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -38,6 +34,8 @@ app.UseCors(x => x
 app.UseMiddleware<HandledResultMiddleware>();
 app.useHealthRoutes();
 app.useAuctionRoutes();
+app.useLookupRoutes();
+app.useBiddingRoutes();
 app.MapHub<ObservationHub>("/observation-hub");
 app.MapHub<ParticipationHub>("/participation-hub");
 

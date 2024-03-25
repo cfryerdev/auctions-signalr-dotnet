@@ -1,6 +1,7 @@
 ﻿using Auctioneer.Logic.Entities;
 using Auctioneer.Logic.Exceptions;
 using Auctioneer.Logic.Services;
+using Auctioneer.Service.BindingModels;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Auctioneer.Service.Routes
@@ -48,26 +49,6 @@ namespace Auctioneer.Service.Routes
 				.WithTags(Tag)
 				.WithDescription("Shows all auctions taking place in the next 7 days.")
 				.Produces<List<Auction>>(200)
-				.Produces<HandledResponseModel>(500)
-				.WithOpenApi();
-
-			app
-				.MapGet("/api/auctions/{id}", (int id, AuctionService service) => {
-					return service.ReadAuctionById(id);
-				})
-				.WithTags(Tag)
-				.WithDescription("Gets details about this auction.")
-				.Produces<Auction>(200)
-				.Produces<HandledResponseModel>(500)
-				.WithOpenApi();
-
-			app
-				.MapGet("/api/auctions/{id}/items", (int id, AuctionService service) => {
-					return service.ReadAuctionItemsById(id);
-				})
-				.WithTags(Tag)
-				.WithDescription("Gets details about this auction.")
-				.Produces<List<AuctionItem>>(200)
 				.Produces<HandledResponseModel>(500)
 				.WithOpenApi();
 		}
