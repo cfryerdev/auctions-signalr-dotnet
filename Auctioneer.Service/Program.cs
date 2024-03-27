@@ -4,8 +4,8 @@ using Auctioneer.Logic.Proxies;
 using Auctioneer.Logic.Services;
 using Auctioneer.Service.Middleware;
 using Auctioneer.Service.Routes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+using System.Data;
+using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -15,12 +15,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => options.AddPolicy("allowAny", o => o.AllowAnyOrigin()));
 builder.Services.AddSignalR();
-builder.Services.AddDbContext<AuctionContext>(o =>
-{
-	var useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
-	if (useInMemory) { o.UseInMemoryDatabase("Auctioneer"); }
-	else { o.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")); }
-}, ServiceLifetime.Singleton);
+builder.Services.AddSingleton<IDbConnection>(sp => new SqlConnection(builder.Configuration.GetConnectionString("SqlConnection")));
+builder.Services.AddSingleton<Seeder>();
 builder.Services.AddSingleton<AuctionService>();
 builder.Services.AddSingleton<RedisService>();
 builder.Services.AddHostedService<ObservationProxy>();

@@ -2,7 +2,6 @@
 using Auctioneer.Logic.Exceptions;
 using Auctioneer.Logic.Services;
 using Auctioneer.Service.BindingModels;
-using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;

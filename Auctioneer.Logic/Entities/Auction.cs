@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using TableAttribute = Dapper.Contrib.Extensions.TableAttribute;
 
 namespace Auctioneer.Logic.Entities
 {
@@ -24,6 +26,7 @@ namespace Auctioneer.Logic.Entities
 	[Table("Auction")]
 	public class Auction
 	{
+		[ExplicitKey]
 		public Guid Id { get; set; }
 
 		public string Name { get; set; }
@@ -36,6 +39,7 @@ namespace Auctioneer.Logic.Entities
 
 		public DateTime EndDateTime { get; set; }
 
+		[Write(false)]
 		public bool IsActive
 		{
 			get
@@ -44,11 +48,12 @@ namespace Auctioneer.Logic.Entities
 			}
 		}
 
+		[Write(false)]
 		public string TimeRemaining
 		{ 
 			get
 			{
-				if (EndDateTime.Date < DateTime.Now.Date)
+				if (EndDateTime < DateTime.Now)
 				{
 					return "This auction has already completed.";
 				}
@@ -62,25 +67,14 @@ namespace Auctioneer.Logic.Entities
 			}
 		}
 
-		public int ItemCount
-		{
-			get
-			{
-				if (Items == null)
-				{
-					return 0;
-				}
-				return Items.Count();
-			}
-		}
-
-		[JsonIgnore]
-		public ICollection<AuctionItem> Items { get; set; }
+		[Write(false)]
+		public int ItemCount { get; set; }
 	}
 
 	[Table("AuctionItem")]
 	public class AuctionItem
 	{
+		[ExplicitKey]
 		public Guid Id { get; set; }
 
 		public int? Index { get; set; }
@@ -90,8 +84,5 @@ namespace Auctioneer.Logic.Entities
 		public string Payload { get; set; }
 
 		public Guid AuctionId { get; set; }
-
-		[JsonIgnore]
-		public Auction Auction { get; set; }
 	}
 }

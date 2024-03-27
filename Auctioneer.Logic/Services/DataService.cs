@@ -2,6 +2,7 @@
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,12 @@ namespace Auctioneer.Logic.Services
 {
 	public class DataService
 	{
-		private AuctionContext _dbContext;
+		private IDbConnection _database;
 		private IDatabase _redis;
 
-		public DataService(AuctionContext dbContext, RedisService redisService)
+		public DataService(IDbConnection dbConnection, RedisService redisService)
 		{
-			_dbContext = dbContext;
+			_database = dbConnection;
 			_redis = redisService.DefaultDatabase;
 		}
 

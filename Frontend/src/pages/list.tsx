@@ -47,13 +47,13 @@ const TestPage = () => {
           <h3>Currently active auctions</h3>
           {isConnected ? <>
             {liveAuctions.map((item, i) => {
-              return <AuctionCard key={i} auction={item} hasBid={true} />
+              return <AuctionCard key={i} auction={item} />
             })}
           </> : <Loading />}
           <h3>Today's auctions</h3>
           {todayFetched ? <>
             {todaysAuctions != undefined && Array.isArray(todaysAuctions) && todaysAuctions.map((item, i) => {
-              return <AuctionCard key={i} auction={item} hasBid={false} />
+              return <AuctionCard key={i} auction={item} />
             })}
           </> : <Loading />}
         </TabPanel>
@@ -61,7 +61,7 @@ const TestPage = () => {
           <h3>Upcoming auctions</h3>
           {futureFetched ? <>
             {futureAuctions != undefined && Array.isArray(futureAuctions) && futureAuctions.map((item, i) => {
-              return <AuctionCard key={i} auction={item} hasBid={false} />
+              return <AuctionCard key={i} auction={item} />
             })}
           </> : <Loading />}
         </TabPanel>
@@ -69,7 +69,7 @@ const TestPage = () => {
           <h3>Previous auctions</h3>
           {pastFetched ? <>
             {pastAuctions != undefined && Array.isArray(pastAuctions) && pastAuctions.map((item, i) => {
-              return <AuctionCard key={i} auction={item} hasBid={false} />
+              return <AuctionCard key={i} auction={item} />
             })}
           </> : <Loading />}
         </TabPanel>

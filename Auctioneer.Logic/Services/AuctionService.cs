@@ -1,19 +1,23 @@
 ﻿using Auctioneer.Logic.Database;
 using Auctioneer.Logic.Entities;
-using Microsoft.EntityFrameworkCore;
+using Dapper;
 using StackExchange.Redis;
+using System.Data;
 
 namespace Auctioneer.Logic.Services
 {
 	public class AuctionService
 	{
-		private AuctionContext _dbContext;
+		private IDbConnection _database;
 		private IDatabase _redis;
 
-		public AuctionService(AuctionContext dbContext, RedisService redisService) 
+		public AuctionService(RedisService redisService, IDbConnection dbConnection, Seeder seeder) 
 		{
-			_dbContext = dbContext;
+			_database = dbConnection;
 			_redis = redisService.DefaultDatabase;
+
+			seeder.ClearSeedData();
+			seeder.SeedData();
 		}
 
 		public bool SubmitBid(string auctionId, string itemId, string userId, decimal bid)
@@ -43,54 +47,74 @@ namespace Auctioneer.Logic.Services
 
 		public List<Auction> ListPastAuctions()
 		{
-			return _dbContext
-				.Auctions
-				.Where(x => x.StartDateTime.Date < DateTime.Now.Date)
-				.Include(x => x.Items)
+			string sqlQuery = @"
+				SELECT a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime, COUNT(ai.Id) as ItemCount
+				FROM Auction a
+				LEFT JOIN AuctionItem ai ON ai.AuctionId = a.Id
+				WHERE CONVERT(DATE, StartDateTime) < @Today
+				GROUP BY a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime
+			";
+			return _database.Query<Auction>(sqlQuery, new { Today = DateTime.Today.ToString("yyyy-MM-dd") })
 				.ToList();
 		}
 
 		public List<Auction> ListTodaysAuctions()
 		{
-			return _dbContext
-				.Auctions
-				.Where(x => x.StartDateTime.Date == DateTime.Now.Date)
-				.Include(x => x.Items)
+			string sqlQuery = @"
+				SELECT a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime, COUNT(ai.Id) as ItemCount
+				FROM Auction a
+				LEFT JOIN AuctionItem ai ON ai.AuctionId = a.Id
+				WHERE CONVERT(DATE, StartDateTime) = @Today
+				GROUP BY a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime
+			";
+			return _database.Query<Auction>(sqlQuery, new { Today = DateTime.Today.ToString("yyyy-MM-dd") })
 				.ToList();
 		}
 
 		public List<Auction> ListTodaysActiveAuctions()
 		{
-			return _dbContext
-				.Auctions
-				.Include(x => x.Items)
-				.AsEnumerable()
+			string sqlQuery = @"
+				SELECT a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime, COUNT(ai.Id) as ItemCount
+				FROM Auction a
+				LEFT JOIN AuctionItem ai ON ai.AuctionId = a.Id
+				WHERE StartDateTime <= @Today AND EndDateTime >= @Today
+				GROUP BY a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime
+			";
+			return _database.Query<Auction>(sqlQuery, new { Today = DateTime.Now })
 				.Where(x => x.IsActive)
 				.ToList();
 		}
 
 		public List<Auction> ListFutureAuctions()
 		{
-			return _dbContext
-				.Auctions
-				.Where(x => x.StartDateTime.Date > DateTime.Now.Date)
-				.Include(x => x.Items)
+			string sqlQuery = @"
+				SELECT a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime, COUNT(ai.Id) as ItemCount
+				FROM Auction a
+				LEFT JOIN AuctionItem ai ON ai.AuctionId = a.Id
+				WHERE CONVERT(DATE, StartDateTime) > @Today
+				GROUP BY a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime
+			";
+			return _database.Query<Auction>(sqlQuery, new { Today = DateTime.Today.ToString("yyyy-MM-dd") })
 				.ToList();
 		}
 
 		public Auction? ReadAuctionById(Guid id)
 		{
-			return _dbContext
-				.Auctions
-				.Include(x => x.Items)
-				.SingleOrDefault(x => x.Id == id);
+			string sqlQuery = @"
+				SELECT a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime, COUNT(ai.Id) as ItemCount
+				FROM Auction a
+				LEFT JOIN AuctionItem ai ON ai.AuctionId = a.Id
+				WHERE a.Id = @Id
+				GROUP BY a.Id, a.Name, a.TypeId, a.VisibilityId, a.StartDateTime, a.EndDateTime
+			";
+			return _database.Query<Auction>(sqlQuery, new { Id = id })
+				.FirstOrDefault();
 		}
 
 		public ICollection<AuctionItem> ReadAuctionItemsById(Guid id)
 		{
-			return _dbContext
-				.AuctionItems
-				.Where(x => x.AuctionId == id)
+			string sqlQuery = @"SELECT * FROM AuctionItem WHERE AuctionId = @AuctionId";
+			return _database.Query<AuctionItem>(sqlQuery, new { AuctionId = id })
 				.ToList();
 		}
 	}

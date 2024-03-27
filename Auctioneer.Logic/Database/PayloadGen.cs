@@ -29,6 +29,12 @@ namespace Auctioneer.Logic.Database
 
 		private static string[] PossibleTrims = { "Base", "Sport", "Luxury", "Offroad", "Performance", "Premium" };
 
+		private static string GenerateStockNumber()
+		{
+			var rand = new Random();
+			return rand.Next(25000, 85000).ToString();
+		}
+
 		public static string GenerateRandomVehicle()
 		{
 			var rnd = new Random();
@@ -36,6 +42,7 @@ namespace Auctioneer.Logic.Database
 			var randomMake = PossibleModelsByMake.ElementAt(randomMakeIndex);
 			var randomVehicle = new Vehicle
 			{
+				Id = GenerateStockNumber(),
 				Year = rnd.Next(MinYear, MaxYear),
 				Make = randomMake.Key,
 				Model = randomMake.Value[rnd.Next(randomMake.Value.Length)],

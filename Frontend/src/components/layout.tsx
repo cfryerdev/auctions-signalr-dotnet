@@ -34,7 +34,14 @@ const GlobalTheme = () => {
   return (
     <GlobalStyles
       styles={(theme) => ({
-        body: { padding: 0, margin: 0 }
+        body: { padding: 0, margin: 0 },
+        a: {
+          textDecoration: 'none',
+          color: '#555',
+          '&:hover': {
+            textDecoration: 'underline',
+          },
+        },
       })}
     />
   )

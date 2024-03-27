@@ -16,6 +16,16 @@ const fetchFutureAuctions = async () => {
     return await response.json();
 }
 
+const fetchAuctionDetails = async (id: string) => {
+    const response = await fetch(`http://localhost:5135/api/lookups/auctions/${id}`);
+    return await response.json();
+}
+
+const fetchAuctionItems = async (id: string) => {
+    const response = await fetch(`http://localhost:5135/api/lookups/auctions/${id}/items`);
+    return await response.json();
+}
+
 export const usePastAuctions = () => {
     return useQuery('fetchPastAuctions', fetchPastAuctions);
 };
@@ -28,8 +38,18 @@ export const useFutureAuctions = () => {
     return useQuery('fetchFutureAuctions', fetchFutureAuctions);
 };
 
+export const useAuctionDetails = (id: string) => {
+    return useQuery('fetchAuctionDetails', () => { return fetchAuctionDetails(id) });
+}
+
+export const useAuctionItems = (id: string) => {
+    return useQuery('fetchAuctionItems', () => { return fetchAuctionItems(id) });
+}
+
 export default {
     fetchPastAuctions,
     fetchTodaysAuctions,
-    fetchFutureAuctions
+    fetchFutureAuctions,
+    fetchAuctionDetails,
+    fetchAuctionItems
 }
